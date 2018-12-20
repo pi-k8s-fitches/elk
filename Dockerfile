@@ -12,7 +12,7 @@ FROM ${BASE}
 ARG DEBIAN_FRONTEND=noninteractive
 RUN set -x \
  && apt-get update -qq \
- && apt-get install -qqy --no-install-recommends ca-certificates curl \
+ && apt-get install -qqy --no-install-recommends ca-certificates curl cron \
  && apt-get install -qqy openjdk-8-jdk tzdata \
  && apt-get clean \
  && set +x
