@@ -36,8 +36,8 @@ RUN mkdir ${ES_HOME} \
  && rm -f ${ES_PACKAGE} \
  && groupadd -r elasticsearch -g ${ES_GID} \
  && useradd -r -s /usr/sbin/nologin -M -c "Elasticsearch service user" -u ${ES_UID} -g elasticsearch elasticsearch \
- && mkdir -p /var/log/elasticsearch ${ES_PATH_CONF} ${ES_PATH_CONF}/scripts /var/lib/elasticsearch ${ES_PATH_BACKUP} \
- && chown -R elasticsearch:elasticsearch ${ES_HOME} /var/log/elasticsearch /var/lib/elasticsearch ${ES_PATH_CONF} ${ES_PATH_BACKUP}
+ && mkdir -p ${ES_PATH_CONF} ${ES_PATH_CONF}/scripts /var/lib/elasticsearch ${ES_PATH_BACKUP} \
+ && chown -R elasticsearch:elasticsearch ${ES_HOME} /var/lib/elasticsearch ${ES_PATH_CONF} ${ES_PATH_BACKUP}
 
 ADD conf/elasticsearch-init /etc/init.d/elasticsearch
 RUN sed -i -e 's#^ES_HOME=$#ES_HOME='$ES_HOME'#' /etc/init.d/elasticsearch \
@@ -60,8 +60,8 @@ RUN mkdir ${LOGSTASH_HOME} \
  && rm -f ${LOGSTASH_PACKAGE} \
  && groupadd -r logstash -g ${LOGSTASH_GID} \
  && useradd -r -s /usr/sbin/nologin -d ${LOGSTASH_HOME} -c "Logstash service user" -u ${LOGSTASH_UID} -g logstash logstash \
- && mkdir -p /var/log/logstash ${LOGSTASH_PATH_CONF}/conf.d \
- && chown -R logstash:logstash ${LOGSTASH_HOME} /var/log/logstash ${LOGSTASH_PATH_CONF}
+ && mkdir -p ${LOGSTASH_PATH_CONF}/conf.d \
+ && chown -R logstash:logstash ${LOGSTASH_HOME} ${LOGSTASH_PATH_CONF}
 
 ADD conf/logstash-init /etc/init.d/logstash
 RUN sed -i -e 's#^LS_HOME=$#LS_HOME='$LOGSTASH_HOME'#' /etc/init.d/logstash \
@@ -82,8 +82,7 @@ RUN mkdir ${KIBANA_HOME} \
  && rm -f ${KIBANA_PACKAGE} \
  && groupadd -r kibana -g ${KIBANA_GID} \
  && useradd -r -s /usr/sbin/nologin -d ${KIBANA_HOME} -c "Kibana service user" -u ${KIBANA_UID} -g kibana kibana \
- && mkdir -p /var/log/kibana \
- && chown -R kibana:kibana ${KIBANA_HOME} /var/log/kibana
+ && chown -R kibana:kibana ${KIBANA_HOME}
 
 ADD conf/kibana-init /etc/init.d/kibana
 RUN sed -i -e 's#^KIBANA_HOME=$#KIBANA_HOME='$KIBANA_HOME'#' /etc/init.d/kibana \
@@ -146,10 +145,10 @@ ADD conf/kibana.yml ${KIBANA_HOME}/config/kibana.yml
 #                                   START
 ###############################################################################
 
-ADD conf/start.sh /usr/local/bin/start.sh
+ADD start.sh /usr/local/bin/start.sh
 RUN chmod +x /usr/local/bin/start.sh
 
-EXPOSE 5601 9200 9300 5044
-VOLUME ["/var/lib/elasticsearch", "/var/log/elasticsearch", "/var/log/logstash", "/var/log/kibana"]
+EXPOSE 5601 9200 5044
+VOLUME ["/var/lib/elasticsearch", "/var/log"]
 
 CMD [ "/usr/local/bin/start.sh" ]

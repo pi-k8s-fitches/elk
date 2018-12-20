@@ -5,7 +5,7 @@ TAG="$(VERSION)-$(MACHINE)"
 ACCOUNT=gaf3
 NAMESPACE=fitches
 PORT=6870
-VOLUMES=-v ${PWD}/elasticsearch:/opt/graphite/elasticsearch -v ${PWD}/log/elasticsearch:/var/log/elasticsearch -v ${PWD}/log/logstash:/var/log/logstash -v ${PWD}/log/kibana:/var/log/kibana
+VOLUMES=-v ${PWD}/storage:/var/lib/elasticsearch -v ${PWD}/log:/var/log
 
 ifeq ($(MACHINE),armv7l)
 BASE=arm32v7/ubuntu:18.04

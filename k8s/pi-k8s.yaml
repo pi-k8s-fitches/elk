@@ -36,12 +36,10 @@ spec:
             path: /
             port: 5601
         volumeMounts:
-        - mountPath: /opt/elk/storage
+        - mountPath: /var/lib/elasticsearch
           name: storage
         - mountPath: /var/log
           name: log
-        - mountPath: /var/lib/redis
-          name: redis
       volumes:
       - name: storage
         hostPath:
@@ -50,10 +48,6 @@ spec:
       - name: log
         hostPath:
           path: /var/lib/pi-k8s/elk/log
-          type: DirectoryOrCreate
-      - name: redis
-        hostPath:
-          path: /var/lib/pi-k8s/elk/redis
           type: DirectoryOrCreate
 ---
 kind: Service
@@ -66,17 +60,18 @@ spec:
     app: elk
   type: NodePort
   ports:
-  - name: GUI
+  - name: kibana
     protocol: TCP
     port: 5601
     targetPort: 5601
     nodePort: 30068
-  - name: carbon receiver - plaintext
+  - name: elasticsearch
     protocol: TCP
     port: 9200
     targetPort: 9200
-  - name: carbon receiver - pickle
+    nodePort: 31200
+  - name: logstash
     protocol: TCP
     port: 5044
     targetPort: 5044
-
+    nodePort: 32044

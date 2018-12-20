@@ -11,6 +11,13 @@
 #   prepared to reap zombie processes).
 
 
+## Create and set the log directories
+
+mkdir -p /var/log/elasticsearch /var/log/logstash /var/log/kibana
+chown -R elasticsearch:elasticsearch /var/log/elasticsearch
+chown -R logstash:logstash /var/log/logstash
+chown -R kibana:kibana /var/log/kibana
+
 ## handle termination gracefully
 
 _term() {
