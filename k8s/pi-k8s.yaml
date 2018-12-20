@@ -1,0 +1,82 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: elk
+  namespace: fitches
+  labels:
+    app: elk
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: elk
+  template:
+    metadata:
+      labels:
+        app: elk
+    spec:
+      nodeSelector:
+        storage: enabled
+      containers:
+      - name: elk
+        image: docker.io/gaf3/pi-k8s-fitches-elk:0.1-armv7l
+        ports:
+        - containerPort: 5601
+        - containerPort: 9200
+        - containerPort: 5044
+        readinessProbe:
+          initialDelaySeconds: 30
+          httpGet:
+            path: /
+            port: 5601
+        livenessProbe:
+          initialDelaySeconds: 30
+          periodSeconds: 5
+          httpGet:
+            path: /
+            port: 5601
+        volumeMounts:
+        - mountPath: /opt/elk/storage
+          name: storage
+        - mountPath: /var/log
+          name: log
+        - mountPath: /var/lib/redis
+          name: redis
+      volumes:
+      - name: storage
+        hostPath:
+          path: /var/lib/pi-k8s/elk/storage
+          type: DirectoryOrCreate
+      - name: log
+        hostPath:
+          path: /var/lib/pi-k8s/elk/log
+          type: DirectoryOrCreate
+      - name: redis
+        hostPath:
+          path: /var/lib/pi-k8s/elk/redis
+          type: DirectoryOrCreate
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: elk
+  namespace: fitches
+spec:
+  selector:
+    app: elk
+  type: NodePort
+  ports:
+  - name: GUI
+    protocol: TCP
+    port: 5601
+    targetPort: 5601
+    nodePort: 30068
+  - name: carbon receiver - plaintext
+    protocol: TCP
+    port: 9200
+    targetPort: 9200
+  - name: carbon receiver - pickle
+    protocol: TCP
+    port: 5044
+    targetPort: 5044
+
